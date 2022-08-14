@@ -22,9 +22,9 @@ import { handleExchange } from "../services/swaps";
 
 export function handleAddLiquidity2(event: AddLiquidity): void {
   let pool = getOrCreatePool(event.address, event);
-
+  
   handleLiquidityEvent('deposit',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event)
-  handleLiquidityFees(pool, event.params.fees, event); // liquidity fees only take on remove liquidity imbalance and add liquidity
+  handleLiquidityFees(pool, event.params.fees, event, "deposit"); // liquidity fees only take on remove liquidity imbalance and add liquidity
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
@@ -45,7 +45,7 @@ export function handleRemoveLiquidityImbalance2(event: RemoveLiquidityImbalance)
   let pool = getOrCreatePool(event.address, event);
 
   handleLiquidityEvent('withdraw',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event)
-  handleLiquidityFees(pool, event.params.fees, event); // liquidity fees only take on remove liquidity imbalance and add liquidity
+  handleLiquidityFees(pool, event.params.fees, event, "withdraw"); // liquidity fees only take on remove liquidity imbalance and add liquidity
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated

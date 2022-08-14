@@ -55,7 +55,7 @@ export function handleDeposit(event: Deposit): void {
       log.error('pool address not found for lpToken: {}', [lptoken.toHexString()]);
       return;
     }
-    let pool = getOrCreatePool(Address.fromString(poolAddress), event);
+    let pool = getOrCreatePool(Address.fromString(poolAddress), event, lptoken);
     handleLpStaking(pool, poolInfo, lpstakingContract, event.block.timestamp);
     pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount.plus(event.params.amount);
     pool.save();

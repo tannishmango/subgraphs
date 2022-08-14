@@ -1,10 +1,9 @@
 import { BigDecimal, Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount, LiquidityPool } from "../../generated/schema";
 import { getLpTokenPriceUSD, getPoolAssetPrice } from "../services/snapshots";
-//import { getLpTokenPriceUSD, getPoolAssetPrice } from "../services/snapshots";
 import {
-  BIGDECIMAL_ONE,
   BIGDECIMAL_ONE_HUNDRED,
+  BIGDECIMAL_TWO,
   BIGDECIMAL_ZERO,
   LiquidityPoolFeeType,
   SECONDS_PER_DAY,
@@ -156,16 +155,35 @@ export function updateProtocolRevenue(
   liquidityPool: LiquidityPool,
   volumeUSD: BigDecimal,
   event: ethereum.Event,
+  eventType: string = "swap"
 ): void {
   let protocol = getOrCreateDexAmm();
   let financialSnapshot = getOrCreateFinancialsDailySnapshot(event);
-  let LpFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_LP_FEE).feePercentage.div(
+  if (["deposit", "withdraw"].includes(eventType)){ // deposits and withdraws include a fees[] in the event, therefore can use the nominal amount in the param "volumeUSD"
+
+    let totalRevenueUSD = volumeUSD;
+    let supplySideRevenue = volumeUSD.div(BIGDECIMAL_TWO);
+    let protocolRevenue = volumeUSD.div(BIGDECIMAL_TWO);
+    financialSnapshot.dailySupplySideRevenueUSD = financialSnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenue);
+    financialSnapshot.dailyProtocolSideRevenueUSD = financialSnapshot.dailyProtocolSideRevenueUSD.plus(protocolRevenue);
+    financialSnapshot.dailyTotalRevenueUSD = financialSnapshot.dailyTotalRevenueUSD.plus(totalRevenueUSD);
+  
+    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenue);
+    protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolRevenue);
+    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
+
+    financialSnapshot.save();
+    protocol.save();
+  }
+
+
+  let LpFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_LP_FEE).feePercentage!.div(
     BIGDECIMAL_ONE_HUNDRED,
   );
-  let protocolFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_PROTOCOL_FEE).feePercentage.div(
+  let protocolFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_PROTOCOL_FEE).feePercentage!.div(
     BIGDECIMAL_ONE_HUNDRED,
   );
-  let totalFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_TRADING_FEE).feePercentage.div(
+  let totalFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_TRADING_FEE).feePercentage!.div(
     BIGDECIMAL_ONE_HUNDRED,
   );
 
@@ -185,18 +203,19 @@ export function updateProtocolRevenue(
   protocol.save();
 }
 
+
 export function calculateLiquidityFeesUSD(pool: LiquidityPool, fees: BigInt[], event: ethereum.Event): BigDecimal {
   let feeSum = BIGDECIMAL_ZERO;
   for (let i = 0; i < fees.length; i++) {
     let token = getOrCreateToken(Address.fromString(pool.inputTokens[i]));
     feeSum = feeSum.plus(bigIntToBigDecimal(fees[i], token.decimals));
   }
-  let poolAssetPrice = getPoolAssetPrice(pool, event.block.timestamp);
+  let poolAssetPrice = getPoolAssetPrice(pool.inputTokens, event.block.timestamp);
   let totalFeesUSD = feeSum.times(poolAssetPrice);
   return totalFeesUSD;
 }
 
-export function handleLiquidityFees(pool: LiquidityPool, fees: BigInt[], event: ethereum.Event): void {
+export function handleLiquidityFees(pool: LiquidityPool, fees: BigInt[], event: ethereum.Event, eventType: string = "deposit"): void {
   const totalFeesUSD = calculateLiquidityFeesUSD(pool, fees, event);
-  updateProtocolRevenue(pool, totalFeesUSD, event);
+  updateProtocolRevenue(pool, totalFeesUSD, event, eventType);
 }

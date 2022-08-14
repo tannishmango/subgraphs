@@ -30,8 +30,10 @@ import {
   EARLY_BASEPOOLS,
   PoolType,
   ZERO_ADDRESS,
+  ADDRESS_ZERO,
 } from "./constants";
 import { createNewPool, getBasePool, getLpToken, getPoolCoinsFromAddress } from "../services/pool";
+
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -228,6 +230,17 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
   return protocol;
 }
 
+export function createPoolFeeID(poolID: string, feeType: string): LiquidityPoolFee {
+  let poolFee = LiquidityPoolFee.load(feeType + "-" + poolID);
+    if (!poolFee) {
+    poolFee = new LiquidityPoolFee(feeType + "-" + poolID);
+    poolFee.feeType = feeType;
+    poolFee.save();
+  }
+  return poolFee;
+}
+
+
 export function getPoolFee(poolID: string, feeType: string): LiquidityPoolFee {
   let poolFee = LiquidityPoolFee.load(feeType + "-" + poolID);
   if (!poolFee) {
@@ -258,10 +271,10 @@ export function getRewardtoken(rewardTokenId: string): RewardToken {
   return rewardToken;
 }
 
-export function getOrCreatePool(poolAddress: Address, event: ethereum.Event): LiquidityPool {
+export function getOrCreatePool(poolAddress: Address, event: ethereum.Event, lpTokenAddress: Address = ADDRESS_ZERO): LiquidityPool {
   let pool = LiquidityPool.load(poolAddress.toHexString());
   if (!pool) {
-    const lpToken = getLpToken(poolAddress);
+    const lpToken = lpTokenAddress == ADDRESS_ZERO ? getLpToken(poolAddress) : lpTokenAddress;
     const lpTokenEntity = getOrCreateToken(lpToken);
     const basePool = getBasePool(poolAddress);
     const poolCoins = getPoolCoinsFromAddress(poolAddress)
