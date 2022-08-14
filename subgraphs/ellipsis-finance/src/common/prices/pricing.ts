@@ -15,10 +15,10 @@ import {
   SIDECHAIN_SUBSTITUTES,
   USDC_ADDRESS,
   WBNB_ADDRESS,
+  BUSD_DECIMALS,
 } from "../constants";
 import { getOrCreateToken } from "../getters";
-import { UniswapRouter } from "../../../generated/Factory/UniswapRouter"
-
+import { UniswapRouter } from "../../../generated/Factory/UniswapRouter";
 
 export function getPriceFromRouter(token: Address): BigDecimal | null {
   let path: Address[] = [token, WBNB_ADDRESS, BUSD_ADDRESS];
@@ -26,13 +26,13 @@ export function getPriceFromRouter(token: Address): BigDecimal | null {
   let decimals = getDecimals(token);
   let tokenAmount = exponentToBigInt(decimals.toI32());
   let amountsOutCall = router.try_getAmountsOut(tokenAmount, path);
-  if (!amountsOutCall.reverted){
-    let priceUSD = bigIntToBigDecimal(amountsOutCall.value[amountsOutCall.value.length-1],decimals.toI32());
-    return priceUSD
+  if (!amountsOutCall.reverted) {
+    let priceUSD = bigIntToBigDecimal(amountsOutCall.value[amountsOutCall.value.length - 1], BUSD_DECIMALS);
+    log.error("getPriceFromRouter token {} price {}", [token.toHexString(), priceUSD.toString()]);
+    return priceUSD;
   }
-  return null
+  return null;
 }
-
 
 export function getEthRate(token: Address): BigDecimal {
   let eth = BIGDECIMAL_ONE;
@@ -64,9 +64,8 @@ export function getEthRate(token: Address): BigDecimal {
     return eth.div(BIG_DECIMAL_1E18);
   }
 
-  return eth
+  return eth;
 }
-
 
 export function getDecimals(token: Address): BigInt {
   let tokenEntity = getOrCreateToken(token);
@@ -101,7 +100,6 @@ export function getTokenAValueInTokenB(tokenA: Address, tokenB: Address): BigDec
     .div(exponentToBigDecimal(decimalsB.toI32()));
 }
 
-
 export function getUsdRate(token: Address): BigDecimal {
   const usd = BIGDECIMAL_ONE;
   if (SIDECHAIN_SUBSTITUTES.has(token.toHexString())) {
@@ -109,14 +107,13 @@ export function getUsdRate(token: Address): BigDecimal {
   }
   if (token != BUSD_ADDRESS && token != USDC_ADDRESS) {
     let priceUSD = getPriceFromRouter(token);
-    if (priceUSD){
-      return priceUSD
+    if (priceUSD) {
+      return priceUSD;
     }
     return getTokenAValueInTokenB(token, BUSD_ADDRESS);
   }
-  return usd
+  return usd;
 }
-
 
 export function getBtcRate(token: Address): BigDecimal {
   const wbtc = BIGDECIMAL_ONE;
@@ -125,4 +122,3 @@ export function getBtcRate(token: Address): BigDecimal {
   }
   return wbtc;
 }
-

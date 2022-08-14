@@ -16,15 +16,13 @@ import { getPlatform } from "../services/platform";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import { StableSwap } from "../../generated/Factory/StableSwap";
 
-
 function initBalancesList(pool: LiquidityPool): BigInt[] {
   let inputTokensBalances: BigInt[] = [];
   for (let i = 0; i < pool.inputTokens.length; i++) {
-    inputTokensBalances.push(BIGINT_ZERO)
+    inputTokensBalances.push(BIGINT_ZERO);
   }
   return inputTokensBalances;
 }
-
 
 export function setPoolBalances(pool: LiquidityPool): void {
   //let poolContract = StableSwap.bind(Address.fromString(pool.id));
@@ -36,10 +34,11 @@ export function setPoolBalances(pool: LiquidityPool): void {
     let token = pool.inputTokens[i];
     let balanceCall = ERC20.bind(Address.fromString(token)).try_balanceOf(Address.fromString(pool.id));
     if (!balanceCall.reverted) {
+      log.error("setPoolBalances pool {} token {} balance {}", [pool.id, token, balanceCall.value.toString()]);
       inputTokensBalances.push(balanceCall.value);
     }
   }
-  //} 
+  //}
   /*else {
     let coins = pool.coins;
     for (let i = 0; i < coins.length; ++i) {
@@ -59,7 +58,6 @@ export function setPoolBalances(pool: LiquidityPool): void {
   return;
 }
 
-
 export function setPoolFeesV2(pool: LiquidityPool): void {
   let curvePool = StableSwap.bind(Address.fromString(pool.id));
   let totalFeeCall = curvePool.try_fee();
@@ -78,8 +76,10 @@ export function setPoolFeesV2(pool: LiquidityPool): void {
   let lpFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.DYNAMIC_LP_FEE);
   lpFee.feePercentage = totalFee.minus(adminFee.times(totalFee)).times(BIGDECIMAL_ONE_HUNDRED);
   lpFee.save();
-  
-  let liqFeeRatio = BigDecimal.fromString(BigInt.fromI32(pool.inputTokens.length / (4 * (pool.inputTokens.length - 1))).toString());
+
+  let liqFeeRatio = BigDecimal.fromString(
+    BigInt.fromI32(pool.inputTokens.length / (4 * (pool.inputTokens.length - 1))).toString(),
+  );
 
   let depositFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.DEPOSIT_FEE);
   depositFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
@@ -92,21 +92,20 @@ export function setPoolFeesV2(pool: LiquidityPool): void {
   let poolFees = [tradingFee.id, protocolFee.id, lpFee.id, depositFee.id, withdrawFee.id];
   pool.fees = poolFees;
   pool.save();
-  return
+  return;
 }
-
 
 export function setPoolFees(pool: LiquidityPool): void {
   let curvePool = StableSwap.bind(Address.fromString(pool.id));
   if (pool.isV2) {
     setPoolFeesV2(pool);
-    return
+    return;
   }
   let totalFeeCall = curvePool.try_fee();
   let adminFeeCall = curvePool.try_admin_fee();
   let totalFee = totalFeeCall.reverted ? POOL_FEE : bigIntToBigDecimal(totalFeeCall.value, FEE_DENOMINATOR_DECIMALS); // format to percentage
   let adminFee = adminFeeCall.reverted ? ADMIN_FEE : bigIntToBigDecimal(adminFeeCall.value, FEE_DENOMINATOR_DECIMALS); // format to percentage
-  
+
   let tradingFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.FIXED_TRADING_FEE);
   tradingFee.feePercentage = totalFee.times(BIGDECIMAL_ONE_HUNDRED);
   tradingFee.save();
@@ -119,7 +118,9 @@ export function setPoolFees(pool: LiquidityPool): void {
   lpFee.feePercentage = totalFee.minus(adminFee.times(totalFee)).times(BIGDECIMAL_ONE_HUNDRED);
   lpFee.save();
 
-  let liqFeeRatio = BigDecimal.fromString(BigInt.fromI32(pool.inputTokens.length / (4 * (pool.inputTokens.length - 1))).toString());
+  let liqFeeRatio = BigDecimal.fromString(
+    BigInt.fromI32(pool.inputTokens.length / (4 * (pool.inputTokens.length - 1))).toString(),
+  );
 
   let depositFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.DEPOSIT_FEE);
   depositFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
@@ -132,9 +133,8 @@ export function setPoolFees(pool: LiquidityPool): void {
   let poolFees = [tradingFee.id, protocolFee.id, lpFee.id, depositFee.id, withdrawFee.id];
   pool.fees = poolFees;
   pool.save();
-  return
+  return;
 }
-
 
 export function setPoolOutputTokenSupply(pool: LiquidityPool): void {
   let outputTokenSupply = ERC20.bind(Address.fromString(pool.outputToken)).try_totalSupply();
@@ -145,7 +145,6 @@ export function setPoolOutputTokenSupply(pool: LiquidityPool): void {
   pool.outputTokenSupply = outputTokenSupply.value;
   pool.save();
 }
-
 
 export function setPoolTokenWeights(liquidityPool: LiquidityPool, timestamp: BigInt): void {
   // only calculate AFTER TVL has been set/updated
@@ -169,13 +168,18 @@ export function setPoolTokenWeights(liquidityPool: LiquidityPool, timestamp: Big
   liquidityPool.save();
 }
 
-
 export function setPoolTVL(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
   const priceUSD = getPoolAssetPrice(pool.inputTokens, timestamp);
   for (let j = 0; j < pool.inputTokens.length; j++) {
     let balance = pool.inputTokenBalances[j];
     let token = getOrCreateToken(Address.fromString(pool.inputTokens[j]));
+    log.error("setPoolTVL: token = {}, balance = {}, decimals = {}, priceUSD = {}", [
+      token.id,
+      balance.toString(),
+      token.decimals.toString(),
+      priceUSD.toString(),
+    ]);
     totalValueLockedUSD = totalValueLockedUSD.plus(bigIntToBigDecimal(balance, token.decimals).times(priceUSD));
   }
   pool.totalValueLockedUSD = totalValueLockedUSD;
@@ -183,7 +187,6 @@ export function setPoolTVL(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   setPoolTokenWeights(pool, timestamp); // reweight pool every time TVL changes
   return totalValueLockedUSD;
 }
-
 
 export function setProtocolTVL(): void {
   // updates all pool TVLs along with protocol TVL
@@ -201,7 +204,6 @@ export function setProtocolTVL(): void {
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.save();
 }
-
 
 export function setLpTokenPool(lpToken: Address, pool: Address): void {
   let lpTokenPool = new LptokenPool(lpToken.toHexString());

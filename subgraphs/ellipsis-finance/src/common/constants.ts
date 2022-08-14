@@ -118,6 +118,8 @@ export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
+export const BUSD_DECIMALS = 18;
+
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_NEG_ONE = BigInt.fromI32(-1);
@@ -225,10 +227,10 @@ export const REGISTRY_ADDRESS_V2 = Address.fromString("0x266Bb386252347b03C7B6eB
 
 export const PANCAKE_ROUTER_ADDRESS = Address.fromString("0x10ED43C718714eb63d5aA57B78B54704E256024E");
 
-export const MISSING_POOLS: string[] = ["0x2ddF6Da17Ae64c22b3Af75158726F2B5F73Ea332"]
-export const MISSING_POOL_COINS: string[][] = [["0x2e3E3e3CAD5478F63549b7207c860A7f8FEDf4C9", "0xB7d9905eDf8B7B093E3C74af8d6982D0F3d37762"]]
-export const MISSING_LP_TOKENS: string[] = ["0x4084203afbc9b20a3ecb9c80dc164a13c9a41eeb"]
-export const MISSING_BASE_POOLs: string[] = [ZERO_ADDRESS]
-export const MISSING_BASEPOOL_COINS: string[][] = [[]]
-
-
+export const MISSING_POOLS: string[] = ["0x2ddF6Da17Ae64c22b3Af75158726F2B5F73Ea332"];
+export const MISSING_POOL_COINS: string[][] = [
+  ["0x2e3E3e3CAD5478F63549b7207c860A7f8FEDf4C9", "0xB7d9905eDf8B7B093E3C74af8d6982D0F3d37762"],
+];
+export const MISSING_LP_TOKENS: string[] = ["0x4084203afbc9b20a3ecb9c80dc164a13c9a41eeb"];
+export const MISSING_BASE_POOLs: string[] = [ZERO_ADDRESS];
+export const MISSING_BASEPOOL_COINS: string[][] = [[]];
