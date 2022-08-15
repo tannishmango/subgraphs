@@ -16,12 +16,17 @@ import {
   USDC_ADDRESS,
   WBNB_ADDRESS,
   BUSD_DECIMALS,
+  DEFAULT_DECIMALS,
+  NATIVE_BNB,
 } from "../constants";
 import { getOrCreateToken } from "../getters";
 import { UniswapRouter } from "../../../generated/Factory/UniswapRouter";
 
 export function getPriceFromRouter(token: Address): BigDecimal | null {
   let path: Address[] = [token, WBNB_ADDRESS, BUSD_ADDRESS];
+  if (token == WBNB_ADDRESS || token == NATIVE_BNB) {
+    path = [WBNB_ADDRESS, BUSD_ADDRESS];
+  }
   let router = UniswapRouter.bind(PANCAKE_ROUTER_ADDRESS);
   let decimals = getDecimals(token);
   let tokenAmount = exponentToBigInt(decimals.toI32());
@@ -68,12 +73,11 @@ export function getEthRate(token: Address): BigDecimal {
 }
 
 export function getDecimals(token: Address): BigInt {
+  if (token == NATIVE_BNB) {
+    return BigInt.fromI32(DEFAULT_DECIMALS);
+  }
   let tokenEntity = getOrCreateToken(token);
   return BigInt.fromI32(tokenEntity.decimals);
-  /*
-  const tokenContract = ERC20.bind(token);
-  const decimalsResult = tokenContract.try_decimals();
-  return decimalsResult.reverted ? BigInt.fromI32(18) : BigInt.fromI32(decimalsResult.value);*/
 }
 
 // Computes the value of one unit of Token A in units of Token B

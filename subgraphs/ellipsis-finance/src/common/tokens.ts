@@ -3,6 +3,7 @@ import { ERC20 } from "../../generated/Factory/ERC20";
 import { ERC20SymbolBytes } from "../../generated/Factory/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/Factory/ERC20NameBytes";
 import { Address } from "@graphprotocol/graph-ts";
+import { DEFAULT_DECIMALS, NATIVE_TOKEN_ADDRESS } from "./constants";
 
 export const INVALID_TOKEN_DECIMALS = 0;
 export const UNKNOWN_TOKEN_VALUE = "unknown";
@@ -67,6 +68,9 @@ export function fetchTokenName(tokenAddress: Address): string {
 
 export function fetchTokenDecimals(tokenAddress: Address): i32 {
   let contract = ERC20.bind(tokenAddress);
+  if (tokenAddress == NATIVE_TOKEN_ADDRESS) {
+    return DEFAULT_DECIMALS;
+  }
 
   // try types uint8 for decimals
   let decimalResult = contract.try_decimals();

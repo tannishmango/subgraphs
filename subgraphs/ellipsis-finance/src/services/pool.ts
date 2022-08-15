@@ -12,10 +12,16 @@ import {
   ZERO_ADDRESS,
 } from "../common/constants";
 import { getOrCreateToken } from "../common/getters";
-import { setLpTokenPool, setPoolBalances, setPoolFees, setPoolOutputTokenSupply, setPoolTVL, setProtocolTVL } from "../common/setters";
+import {
+  setLpTokenPool,
+  setPoolBalances,
+  setPoolFees,
+  setPoolOutputTokenSupply,
+  setPoolTVL,
+  setProtocolTVL,
+} from "../common/setters";
 import { getPlatform } from "./platform";
 import { getLpTokenPriceUSD } from "./snapshots";
-
 
 export function createNewPool(
   poolAddress: Address,
@@ -38,7 +44,11 @@ export function createNewPool(
   const stableSwap = StableSwap.bind(poolAddress);
   const tokens = coins.length > 0 ? coins : getPoolCoins(pool);
   const sortedTokens = tokens.sort();
-  log.error('createNewPool pool {} tokens {}, sorted tokens {}', [poolAddress.toString(),tokens.toString(),sortedTokens.toString()]);
+  log.error("createNewPool pool {} tokens {}, sorted tokens {}", [
+    poolAddress.toHexString(),
+    coins.toString(),
+    sortedTokens.toString(),
+  ]);
   pool.name = name;
   pool.platform = platform.id;
   pool.outputToken = getOrCreateToken(lpToken).id;
@@ -47,7 +57,7 @@ export function createNewPool(
   pool.createdBlockNumber = block;
   pool.createdTimestamp = timestamp;
   pool.basePool = basePool.toHexString();
-  pool.coins = tokens;
+  pool.coins = coins.length > 0 ? coins : getPoolCoins(pool);
   pool.inputTokens = sortedTokens;
   pool.outputTokenPriceUSD = getLpTokenPriceUSD(pool, timestamp, tokens);
   pool.underlyingTokens = getUnderlyingTokens(pool);
@@ -59,20 +69,20 @@ export function createNewPool(
   setPoolOutputTokenSupply(pool);
   pool.save();
   setProtocolTVL();
-  setLpTokenPool(lpToken,poolAddress);
+  setLpTokenPool(lpToken, poolAddress);
   return pool;
 }
 
 export function getLpToken(pool: Address): Address {
   let stableSwap = StableSwap.bind(pool);
-  let lpToken = ADDRESS_ZERO
+  let lpToken = ADDRESS_ZERO;
   let lpTokenCall = stableSwap.try_lp_token();
   if (lpTokenCall.reverted) {
     const poolAddress = pool.toHexString().toLowerCase();
-    if (POOL_LP_TOKEN_MAP.has(poolAddress)){
+    if (POOL_LP_TOKEN_MAP.has(poolAddress)) {
       lpToken = POOL_LP_TOKEN_MAP.get(poolAddress);
-    } else{
-      log.error('cannot find lptoken for pool {}',[pool.toHexString()]);
+    } else {
+      log.error("cannot find lptoken for pool {}", [pool.toHexString()]);
     }
   } else {
     lpToken = lpTokenCall.value;
@@ -197,11 +207,10 @@ export function isLendingPool(pool: Address): boolean {
   return lendingPoolCall.reverted ? false : true;
 }
 
-
 export function cleanCoins(coins: Address[]): string[] {
   let cleanCoins: string[] = [];
   for (let i = 0; i < coins.length; i++) {
-    let coin = coins[i]
+    let coin = coins[i];
     if (coin != ADDRESS_ZERO) {
       cleanCoins.push(coin.toHexString());
     }

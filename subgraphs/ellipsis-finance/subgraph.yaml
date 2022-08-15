@@ -1,7 +1,7 @@
 description: ...
 graft:
-  base: QmSsBdeKG3eWLD58iU3irP9TvjJd4yoqWbQnvpr7TRTD6x # Subgraph ID of base subgraph
-  block: 15000000 # Block number
+  base: QmVehMsUdgEWPZm5ZXXUeoKUuQiFeouTKUU44URsQ4Czw7 # Subgraph ID of base subgraph
+  block: 16865000 # Block number
 specVersion: 0.0.2
 schema:
   file: ./schema.graphql
@@ -43,8 +43,8 @@ dataSources:
           file: ./abis/prices/Atoken.json
         - name: LpStaking
           file: ./abis/staking/LpStaking.json
-        - name: LpStakingV2
-          file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: BasePoolAdded(address)
           handler: handleBasePoolAdded
@@ -95,6 +95,8 @@ dataSources:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: PoolAdded(indexed address)
           handler: handlePoolAdded
@@ -139,6 +141,8 @@ dataSources:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256)
           handler: handleDeposit
@@ -187,6 +191,8 @@ dataSources:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: Deposit(indexed address,indexed address,uint256)
           handler: handleDepositV2
@@ -235,6 +241,8 @@ dataSources:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
           handler: handleAddLiquidity3
@@ -289,6 +297,8 @@ dataSources:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity2
@@ -340,6 +350,8 @@ dataSources:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity2
@@ -390,6 +402,8 @@ dataSources:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity2
@@ -440,6 +454,8 @@ dataSources:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity2
@@ -490,6 +506,8 @@ dataSources:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity2
@@ -540,6 +558,8 @@ dataSources:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity2
@@ -590,6 +610,8 @@ dataSources:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity2
@@ -640,6 +662,8 @@ dataSources:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity2
@@ -690,6 +714,8 @@ templates:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity2
@@ -742,6 +768,8 @@ templates:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity2
@@ -794,6 +822,8 @@ templates:
           file: ./abis/staking/LpStaking.json
         - name: LpStakingV2
           file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
           handler: handleAddLiquidity3

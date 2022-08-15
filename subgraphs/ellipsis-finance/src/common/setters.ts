@@ -9,6 +9,7 @@ import {
   BIGINT_ZERO,
   FEE_DENOMINATOR_DECIMALS,
   LiquidityPoolFeeType,
+  NATIVE_BNB,
   POOL_FEE,
 } from "./constants";
 import { getPoolAssetPrice } from "../services/snapshots";
@@ -16,43 +17,24 @@ import { getPlatform } from "../services/platform";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import { StableSwap } from "../../generated/Factory/StableSwap";
 
-function initBalancesList(pool: LiquidityPool): BigInt[] {
-  let inputTokensBalances: BigInt[] = [];
-  for (let i = 0; i < pool.inputTokens.length; i++) {
-    inputTokensBalances.push(BIGINT_ZERO);
-  }
-  return inputTokensBalances;
-}
-
 export function setPoolBalances(pool: LiquidityPool): void {
-  //let poolContract = StableSwap.bind(Address.fromString(pool.id));
-  //let inputTokensBalances = initBalancesList(pool);
   let inputTokensBalances: BigInt[] = [];
-  //let balanceCall = poolContract.try_balances(BigInt.fromI32(0));
-  //if (balanceCall.reverted) {
   for (let i = 0; i < pool.inputTokens.length; ++i) {
     let token = pool.inputTokens[i];
-    let balanceCall = ERC20.bind(Address.fromString(token)).try_balanceOf(Address.fromString(pool.id));
-    if (!balanceCall.reverted) {
-      log.error("setPoolBalances pool {} token {} balance {}", [pool.id, token, balanceCall.value.toString()]);
-      inputTokensBalances.push(balanceCall.value);
-    }
-  }
-  //}
-  /*else {
-    let coins = pool.coins;
-    for (let i = 0; i < coins.length; ++i) {
-      let coin = coins[i];
-      let inputTokenIndex = pool.inputTokens.indexOf(coin);
-      balanceCall = poolContract.try_balances(BigInt.fromI32(i));
+    if (token.toLowerCase() == NATIVE_BNB.toHexString().toLowerCase()) {
+      let cryptoSwapContract = StableSwap.bind(Address.fromString(pool.id));
+      let balanceCall = cryptoSwapContract.try_balances(BIGINT_ZERO);
       if (!balanceCall.reverted) {
-        inputTokensBalances[inputTokenIndex] = balanceCall.value;
+        inputTokensBalances.push(balanceCall.value); // all native tokens are the zero index if a pool has native token in it
+      }
+    } else {
+      let balanceCall = ERC20.bind(Address.fromString(token)).try_balanceOf(Address.fromString(pool.id));
+      if (!balanceCall.reverted) {
+        log.error("setPoolBalances pool {} token {} balance {}", [pool.id, token, balanceCall.value.toString()]);
+        inputTokensBalances.push(balanceCall.value);
       }
     }
-    pool.inputTokenBalances = inputTokensBalances;
-    pool.save();
-    return;
-  }*/
+  }
   pool.inputTokenBalances = inputTokensBalances;
   pool.save();
   return;
@@ -171,6 +153,7 @@ export function setPoolTokenWeights(liquidityPool: LiquidityPool, timestamp: Big
 export function setPoolTVL(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
   const priceUSD = getPoolAssetPrice(pool.inputTokens, timestamp);
+  log.error("setPoolTVL: tokens = {}", [pool.inputTokens.toString()]);
   for (let j = 0; j < pool.inputTokens.length; j++) {
     let balance = pool.inputTokenBalances[j];
     let token = getOrCreateToken(Address.fromString(pool.inputTokens[j]));
