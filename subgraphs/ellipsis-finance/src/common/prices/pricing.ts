@@ -18,6 +18,7 @@ import {
   BUSD_DECIMALS,
   DEFAULT_DECIMALS,
   NATIVE_BNB,
+  USDT_ADDRESS,
 } from "../constants";
 import { getOrCreateToken } from "../getters";
 import { UniswapRouter } from "../../../generated/Factory/UniswapRouter";
@@ -109,7 +110,7 @@ export function getUsdRate(token: Address): BigDecimal {
   if (SIDECHAIN_SUBSTITUTES.has(token.toHexString())) {
     token = SIDECHAIN_SUBSTITUTES.get(token.toHexString());
   }
-  if (token != BUSD_ADDRESS && token != USDC_ADDRESS) {
+  if (token != BUSD_ADDRESS && token != USDC_ADDRESS && token != USDT_ADDRESS) {
     let priceUSD = getPriceFromRouter(token);
     if (priceUSD) {
       return priceUSD;

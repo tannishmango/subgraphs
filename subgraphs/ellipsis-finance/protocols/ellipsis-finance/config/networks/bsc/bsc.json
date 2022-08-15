@@ -27,6 +27,6 @@
     { "name": "TUSD", "address": "0x8D7408C2b3154F9f97fc6dd24cd36143908d1E52", "startblock": 6936611 }
   ],
   "graftEnabled": true,
-  "subgraphId": "QmVehMsUdgEWPZm5ZXXUeoKUuQiFeouTKUU44URsQ4Czw7",
-  "graftStartBlock": 16865000
+  "subgraphId": "QmWiTMnadrfLEyTaWAkYjtpFc4zhPL5AEJue8bTTiqrkiJ",
+  "graftStartBlock": 17050074
 }

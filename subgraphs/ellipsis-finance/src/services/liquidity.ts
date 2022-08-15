@@ -3,7 +3,7 @@ import { Deposit, LiquidityPool, Withdraw } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/constants";
 import { createEventID, getOrCreateDexAmm, getOrCreateToken } from "../common/getters";
 import { absValBigInt, bigIntToBigDecimal } from "../common/utils/numbers";
-import { getLpTokenPriceUSD, getTokenPrice } from "./snapshots";
+import { getLpTokenPriceUSD, getTokenPriceSnapshot } from "./snapshots";
 
 export function handleDepositEvent(
   pool: LiquidityPool,
@@ -30,7 +30,7 @@ export function handleDepositEvent(
     let inputTokenAddress = Address.fromString(pool.coins[i]);
     let inputToken = getOrCreateToken(inputTokenAddress);
     let inputTokenAmount = tokenAmounts[i];
-    let inputTokenPrice = getTokenPrice(inputTokenAddress, pool, event.block.timestamp);
+    let inputTokenPrice = getTokenPriceSnapshot(inputTokenAddress, event.block.timestamp);
     inputTokens.push(inputToken.id);
     inputTokenAmounts.push(inputTokenAmount);
     amountUSD = amountUSD.plus(bigIntToBigDecimal(inputTokenAmount, inputToken.decimals).times(inputTokenPrice));
@@ -70,7 +70,7 @@ export function handleWithdrawEvent(
     let inputTokenAddress = Address.fromString(pool.coins[i]);
     let inputToken = getOrCreateToken(inputTokenAddress);
     let inputTokenAmount = tokenAmounts[i];
-    let inputTokenPrice = getTokenPrice(inputTokenAddress, pool, event.block.timestamp);
+    let inputTokenPrice = getTokenPriceSnapshot(inputTokenAddress, event.block.timestamp);
     inputTokens.push(inputToken.id);
     inputTokenAmounts.push(inputTokenAmount);
     amountUSD = amountUSD.plus(bigIntToBigDecimal(inputTokenAmount, inputToken.decimals).times(inputTokenPrice));
