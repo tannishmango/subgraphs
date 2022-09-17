@@ -1,19 +1,18 @@
-import { Address, log } from "@graphprotocol/graph-ts";
+import { log } from "@graphprotocol/graph-ts";
 import { CryptoPoolDeployed } from "../../generated/Factory/CryptoFactory";
-import { LiquidityPool } from "../../generated/schema";
 import { FactoryPools } from "../../generated/templates";
-import { ADDRESS_ZERO, PoolType } from "../common/constants";
+import { ADDRESS_ZERO } from "../common/constants";
 import { getOrCreateToken } from "../common/getters";
-import { createNewPool, getBasePool, getLpToken, isLendingPool, cleanCoins } from "../services/pool";
+import { createNewPool, getBasePool, cleanCoins } from "../services/pool";
 
-export function handleCryptoPoolDeployed(event: PlainPoolDeployed): void {
+export function handleCryptoPoolDeployed(event: CryptoPoolDeployed): void {
   const coins = cleanCoins(event.params.coins);
   log.error("factory.ts handlePlainPoolDeployed tx: {}, coins: {}, lptoken: {}", [
     event.transaction.hash.toHexString(),
     coins.toString(),
-    event.params.lp_token.toHexString(),
+    event.params.token.toHexString(),
   ]);
-  const lp_token = event.params.lp_token;
+  const lp_token = event.params.token;
   const lpTokenEntity = getOrCreateToken(lp_token);
   let pool = event.params.pool;
   if (!pool || pool == ADDRESS_ZERO) {

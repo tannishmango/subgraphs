@@ -171,6 +171,10 @@ export const USDC_ADDRESS = Address.fromString("0x8AC76a51cc950d9822D68b83fE1Ad9
 export const BBTC_ADDRESS = Address.fromString("0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c");
 
 export const SIDECHAIN_SUBSTITUTES = new Map<string, Address>();
+SIDECHAIN_SUBSTITUTES.set(
+  ETH_ADDRESS.toLowerCase(), // native token representation address
+  WBNB_ADDRESS,
+);
 
 export const TRICRYPTO_LP_TOKEN = Address.fromString("0xaF4dE8E872131AE328Ce21D909C74705d3Aaf452");
 export const POOL_LP_TOKEN_MAP = new Map<string, Address>();

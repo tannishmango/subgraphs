@@ -83,8 +83,8 @@ export function getTokenAValueInTokenB(tokenA: Address, tokenB: Address): BigDec
 
 export function getUsdRate(token: Address): BigDecimal {
   const usd = BIGDECIMAL_ONE;
-  if (SIDECHAIN_SUBSTITUTES.has(token.toHexString())) {
-    token = SIDECHAIN_SUBSTITUTES.get(token.toHexString());
+  if (SIDECHAIN_SUBSTITUTES.has(token.toHexString().toLowerCase())) {
+    token = SIDECHAIN_SUBSTITUTES.get(token.toHexString().toLowerCase());
   }
   if (token != BUSD_ADDRESS && token != USDC_ADDRESS) {
     return getTokenAValueInTokenB(token, BUSD_ADDRESS);

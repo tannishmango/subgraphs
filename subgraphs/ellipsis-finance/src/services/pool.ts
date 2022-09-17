@@ -12,7 +12,14 @@ import {
   ZERO_ADDRESS,
 } from "../common/constants";
 import { getOrCreateToken } from "../common/getters";
-import { setLpTokenPool, setPoolBalances, setPoolFees, setPoolOutputTokenSupply, setPoolTVL, setProtocolTVL } from "../common/setters";
+import {
+  setLpTokenPool,
+  setPoolBalances,
+  setPoolFees,
+  setPoolOutputTokenSupply,
+  setPoolTVL,
+  setProtocolTVL,
+} from "../common/setters";
 import { getPlatform } from "./platform";
 import { getLpTokenPriceUSD } from "./snapshots";
 
@@ -37,7 +44,7 @@ export function createNewPool(
   const stableSwap = StableSwap.bind(poolAddress);
   const tokens = coins.length > 0 ? coins : getPoolCoins(pool);
   const sortedTokens = tokens.sort();
-  log.error('createNewPool tokens {}, sorted tokens {}', [tokens.toString(),sortedTokens.toString()]);
+  log.error("createNewPool tokens {}, sorted tokens {}", [tokens.toString(), sortedTokens.toString()]);
   pool.name = name;
   pool.platform = platform.id;
   pool.outputToken = getOrCreateToken(lpToken).id;
@@ -58,20 +65,20 @@ export function createNewPool(
   setPoolOutputTokenSupply(pool);
   pool.save();
   setProtocolTVL();
-  setLpTokenPool(lpToken,poolAddress);
+  setLpTokenPool(lpToken, poolAddress);
   return pool;
 }
 
 export function getLpToken(pool: Address): Address {
   let stableSwap = StableSwap.bind(pool);
-  let lpToken = ADDRESS_ZERO
+  let lpToken = ADDRESS_ZERO;
   let lpTokenCall = stableSwap.try_lp_token();
   if (lpTokenCall.reverted) {
     const poolAddress = pool.toHexString().toLowerCase();
-    if (POOL_LP_TOKEN_MAP.has(poolAddress)){
+    if (POOL_LP_TOKEN_MAP.has(poolAddress)) {
       lpToken = POOL_LP_TOKEN_MAP.get(poolAddress);
-    } else{
-      log.error('cannot find lptoken for pool {}',[pool.toHexString()]);
+    } else {
+      log.error("cannot find lptoken for pool {}", [pool.toHexString()]);
     }
   } else {
     lpToken = lpTokenCall.value;
@@ -194,4 +201,15 @@ export function isLendingPool(pool: Address): boolean {
   let curvePool = StableSwap.bind(pool);
   let lendingPoolCall = curvePool.try_wrapped_coins(BIGINT_ZERO);
   return lendingPoolCall.reverted ? false : true;
+}
+
+export function cleanCoins(coins: Address[]): string[] {
+  let cleanCoins: string[] = [];
+  for (let i = 0; i < coins.length; i++) {
+    let coin = coins[i];
+    if (coin != ADDRESS_ZERO) {
+      cleanCoins.push(coin.toHexString());
+    }
+  }
+  return cleanCoins;
 }
