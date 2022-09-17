@@ -1,8 +1,7 @@
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { PancakeFactory } from "../../../generated/Factory/PancakeFactory";
 import { Pair } from "../../../generated/Factory/Pair";
-import { ERC20 } from "../../../generated/factory/ERC20";
-import { exponentToBigDecimal } from "../utils/numbers";
+import { bigIntToBigDecimal, exponentToBigDecimal, exponentToBigInt } from "../utils/numbers";
 import {
   ADDRESS_ZERO,
   BBTC_ADDRESS,
@@ -12,11 +11,34 @@ import {
   BIG_DECIMAL_1E18,
   BUSD_ADDRESS,
   PANCAKE_FACTORY_ADDRESS,
+  PANCAKE_ROUTER_ADDRESS,
   SIDECHAIN_SUBSTITUTES,
   USDC_ADDRESS,
   WBNB_ADDRESS,
-  ZERO_ADDRESS,
+  BUSD_DECIMALS,
+  DEFAULT_DECIMALS,
+  NATIVE_BNB,
+  USDT_ADDRESS,
 } from "../constants";
+import { getOrCreateToken } from "../getters";
+import { UniswapRouter } from "../../../generated/Factory/UniswapRouter";
+
+export function getPriceFromRouter(token: Address): BigDecimal | null {
+  let path: Address[] = [token, WBNB_ADDRESS, BUSD_ADDRESS];
+  if (token == WBNB_ADDRESS || token == NATIVE_BNB) {
+    path = [WBNB_ADDRESS, BUSD_ADDRESS];
+  }
+  let router = UniswapRouter.bind(PANCAKE_ROUTER_ADDRESS);
+  let decimals = getDecimals(token);
+  let tokenAmount = exponentToBigInt(decimals.toI32());
+  let amountsOutCall = router.try_getAmountsOut(tokenAmount, path);
+  if (!amountsOutCall.reverted) {
+    let priceUSD = bigIntToBigDecimal(amountsOutCall.value[amountsOutCall.value.length - 1], BUSD_DECIMALS);
+    log.error("getPriceFromRouter token {} price {}", [token.toHexString(), priceUSD.toString()]);
+    return priceUSD;
+  }
+  return null;
+}
 
 export function getEthRate(token: Address): BigDecimal {
   let eth = BIGDECIMAL_ONE;
@@ -52,9 +74,11 @@ export function getEthRate(token: Address): BigDecimal {
 }
 
 export function getDecimals(token: Address): BigInt {
-  const tokenContract = ERC20.bind(token);
-  const decimalsResult = tokenContract.try_decimals();
-  return decimalsResult.reverted ? BigInt.fromI32(18) : BigInt.fromI32(decimalsResult.value);
+  if (token == NATIVE_BNB) {
+    return BigInt.fromI32(DEFAULT_DECIMALS);
+  }
+  let tokenEntity = getOrCreateToken(token);
+  return BigInt.fromI32(tokenEntity.decimals);
 }
 
 // Computes the value of one unit of Token A in units of Token B
@@ -83,10 +107,14 @@ export function getTokenAValueInTokenB(tokenA: Address, tokenB: Address): BigDec
 
 export function getUsdRate(token: Address): BigDecimal {
   const usd = BIGDECIMAL_ONE;
-  if (SIDECHAIN_SUBSTITUTES.has(token.toHexString().toLowerCase())) {
-    token = SIDECHAIN_SUBSTITUTES.get(token.toHexString().toLowerCase());
+  if (SIDECHAIN_SUBSTITUTES.has(token.toHexString())) {
+    token = SIDECHAIN_SUBSTITUTES.get(token.toHexString());
   }
-  if (token != BUSD_ADDRESS && token != USDC_ADDRESS) {
+  if (token != BUSD_ADDRESS && token != USDC_ADDRESS && token != USDT_ADDRESS) {
+    let priceUSD = getPriceFromRouter(token);
+    if (priceUSD) {
+      return priceUSD;
+    }
     return getTokenAValueInTokenB(token, BUSD_ADDRESS);
   }
   return usd;
@@ -94,10 +122,8 @@ export function getUsdRate(token: Address): BigDecimal {
 
 export function getBtcRate(token: Address): BigDecimal {
   const wbtc = BIGDECIMAL_ONE;
-
   if (token != BBTC_ADDRESS) {
     return getTokenAValueInTokenB(token, BBTC_ADDRESS);
   }
-
   return wbtc;
 }
