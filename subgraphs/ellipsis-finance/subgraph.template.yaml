@@ -31,6 +31,8 @@ dataSources:
           file: ./abis/BasePool3.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -43,8 +45,6 @@ dataSources:
           file: ./abis/prices/Atoken.json
         - name: LpStaking
           file: ./abis/staking/LpStaking.json
-        - name: LpStakingV2
-          file: ./abis/staking/LpStakingV2.json
         - name: CryptoSwap2
           file: ./abis/CryptoSwap2.json
         - name: CryptoFactory
@@ -181,6 +181,8 @@ dataSources:
           file: ./abis/BasePool3.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -231,6 +233,8 @@ dataSources:
           file: ./abis/BasePool3.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -282,6 +286,8 @@ dataSources:
           file: ./abis/BasePool3.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -337,6 +343,8 @@ dataSources:
           file: ./abis/StableSwap.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -390,6 +398,8 @@ templates:
           file: ./abis/StableSwap.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -444,6 +454,8 @@ templates:
           file: ./abis/BasePool3.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -498,6 +510,8 @@ templates:
           file: ./abis/BasePool3.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes

@@ -1,9 +1,7 @@
-{{#graftEnabled}}
 description: ...
 graft:
-  base: {{subgraphId}} # Subgraph ID of base subgraph
-  block: {{graftStartBlock}} # Block number
-{{/graftEnabled}}
+  base: QmWiTMnadrfLEyTaWAkYjtpFc4zhPL5AEJue8bTTiqrkiJ # Subgraph ID of base subgraph
+  block: 17050074 # Block number
 specVersion: 0.0.2
 schema:
   file: ./schema.graphql
@@ -31,6 +29,8 @@ dataSources:
           file: ./abis/BasePool3.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -43,8 +43,6 @@ dataSources:
           file: ./abis/prices/Atoken.json
         - name: LpStaking
           file: ./abis/staking/LpStaking.json
-        - name: LpStakingV2
-          file: ./abis/staking/LpStakingV2.json
         - name: CryptoSwap2
           file: ./abis/CryptoSwap2.json
         - name: CryptoFactory
@@ -121,8 +119,6 @@ dataSources:
       language: wasm/assemblyscript
       entities: []
       abis:
-        - name: CryptoFactory
-          file: ./abis/CryptoFactory.json
         - name: Registry
           file: ./abis/Registry.json
         - name: Factory
@@ -153,6 +149,8 @@ dataSources:
           file: ./abis/staking/LpStakingV2.json
         - name: CryptoSwap2
           file: ./abis/CryptoSwap2.json
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
       eventHandlers:
         - event: CryptoPoolDeployed(address,address,address[2],uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)
           handler: handleCryptoPoolDeployed
@@ -181,6 +179,8 @@ dataSources:
           file: ./abis/BasePool3.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -231,6 +231,8 @@ dataSources:
           file: ./abis/BasePool3.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -258,14 +260,13 @@ dataSources:
           handler: handleEmergencyWithdrawV2
       file: ./src/mappings/staking.ts
 
-{{#basepools}}
   - kind: ethereum
-    name: {{name}}
+    name: 3EPS
     network: bsc
     source:
-      address: "{{address}}"
-      abi: {{abi}}
-      startBlock: {{startblock}}
+      address: "0x160CAed03795365F3A589f10C379FfA7d75d4E76"
+      abi: BasePool3
+      startBlock: 5936381
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -282,6 +283,8 @@ dataSources:
           file: ./abis/BasePool3.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -301,30 +304,86 @@ dataSources:
         - name: CryptoFactory
           file: ./abis/CryptoFactory.json
       eventHandlers:
-        - event: AddLiquidity(indexed address,uint256[{{num_coins}}],uint256[{{num_coins}}],uint256,uint256)
-          handler: handleAddLiquidity{{num_coins}}
-        - event: RemoveLiquidity(indexed address,uint256[{{num_coins}}],uint256[{{num_coins}}],uint256)
-          handler: handleRemoveLiquidity{{num_coins}}
-        - event: RemoveLiquidityImbalance(indexed address,uint256[{{num_coins}}],uint256[{{num_coins}}],uint256,uint256)
-          handler: handleRemoveLiquidityImbalance{{num_coins}}
+        - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
+          handler: handleAddLiquidity3
+        - event: RemoveLiquidity(indexed address,uint256[3],uint256[3],uint256)
+          handler: handleRemoveLiquidity3
+        - event: RemoveLiquidityImbalance(indexed address,uint256[3],uint256[3],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance3
         - event: RemoveLiquidityOne(indexed address,uint256,uint256)
           handler: handleRemoveLiquidityOne
         - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchange
-        - event: NewFee(uint256,uint256{{NewFee}})
-          handler: handleNewFee{{num_coins}}
-      file: ./src/mappings/basepool{{num_coins}}.ts
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee3
+      file: ./src/mappings/basepool3.ts
 
-{{/basepools}}
-
-{{#stablepools}}
   - kind: ethereum
-    name: {{name}}
+    name: btcEPS
     network: bsc
     source:
-      address: "{{address}}"
+      address: "0x2477fB288c5b4118315714ad3c7Fd7CC69b00bf9"
+      abi: BasePool2
+      startBlock: 6570997
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: BasePool2
+          file: ./abis/BasePool2.json
+        - name: BasePool3
+          file: ./abis/BasePool3.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: PancakeFactory
+          file: ./abis/PancakeFactory.json
+        - name: Pair
+          file: ./abis/Pair.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: LpStaking
+          file: ./abis/staking/LpStaking.json
+        - name: LpStakingV2
+          file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity2
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity2
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance2
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: NewFee(uint256,uint256,uint256)
+          handler: handleNewFee2
+      file: ./src/mappings/basepool2.ts
+
+
+  - kind: ethereum
+    name: anyBTC
+    network: bsc
+    source:
+      address: "0xf707Df3e4c70E40c2F26C660338dD0C81ad280f1"
       abi: StableSwap
-      startBlock: {{startblock}}
+      startBlock: 7868954
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -337,6 +396,8 @@ dataSources:
           file: ./abis/StableSwap.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -370,7 +431,330 @@ dataSources:
           handler: handleTokenExchangeUnderlying
       file: ./src/mappings/basepool2.ts
 
-{{/stablepools}}
+  - kind: ethereum
+    name: DAI
+    network: bsc
+    source:
+      address: "0xc6a752948627bECaB5474a10821Df73fF4771a49"
+      abi: StableSwap
+      startBlock: 6935464
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: PancakeFactory
+          file: ./abis/PancakeFactory.json
+        - name: Pair
+          file: ./abis/Pair.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: LpStaking
+          file: ./abis/staking/LpStaking.json
+        - name: LpStakingV2
+          file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity2
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity2
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance2
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+      file: ./src/mappings/basepool2.ts
+
+  - kind: ethereum
+    name: fUSDT
+    network: bsc
+    source:
+      address: "0x556ea0b4c06D043806859c9490072FaadC104b63"
+      abi: StableSwap
+      startBlock: 6310798
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: PancakeFactory
+          file: ./abis/PancakeFactory.json
+        - name: Pair
+          file: ./abis/Pair.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: LpStaking
+          file: ./abis/staking/LpStaking.json
+        - name: LpStakingV2
+          file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity2
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity2
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance2
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+      file: ./src/mappings/basepool2.ts
+
+  - kind: ethereum
+    name: pBTC
+    network: bsc
+    source:
+      address: "0x60E4ED61C6f17972559E86F2125BF8A30f249088"
+      abi: StableSwap
+      startBlock: 7868603
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: PancakeFactory
+          file: ./abis/PancakeFactory.json
+        - name: Pair
+          file: ./abis/Pair.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: LpStaking
+          file: ./abis/staking/LpStaking.json
+        - name: LpStakingV2
+          file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity2
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity2
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance2
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+      file: ./src/mappings/basepool2.ts
+
+  - kind: ethereum
+    name: USDN
+    network: bsc
+    source:
+      address: "0x2f8E25C21A17BD9D0C337e1b409e73bc959B41BE"
+      abi: StableSwap
+      startBlock: 8186429
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: PancakeFactory
+          file: ./abis/PancakeFactory.json
+        - name: Pair
+          file: ./abis/Pair.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: LpStaking
+          file: ./abis/staking/LpStaking.json
+        - name: LpStakingV2
+          file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity2
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity2
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance2
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+      file: ./src/mappings/basepool2.ts
+
+  - kind: ethereum
+    name: UST
+    network: bsc
+    source:
+      address: "0x780de1A0E4613da6b65ceF7F5FB63d14CbDcfB72"
+      abi: StableSwap
+      startBlock: 10655759
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: PancakeFactory
+          file: ./abis/PancakeFactory.json
+        - name: Pair
+          file: ./abis/Pair.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: LpStaking
+          file: ./abis/staking/LpStaking.json
+        - name: LpStakingV2
+          file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity2
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity2
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance2
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+      file: ./src/mappings/basepool2.ts
+
+  - kind: ethereum
+    name: TUSD
+    network: bsc
+    source:
+      address: "0x8D7408C2b3154F9f97fc6dd24cd36143908d1E52"
+      abi: StableSwap
+      startBlock: 6936611
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: PancakeFactory
+          file: ./abis/PancakeFactory.json
+        - name: Pair
+          file: ./abis/Pair.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: LpStaking
+          file: ./abis/staking/LpStaking.json
+        - name: LpStakingV2
+          file: ./abis/staking/LpStakingV2.json
+        - name: CryptoSwap2
+          file: ./abis/CryptoSwap2.json
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity2
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity2
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance2
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+      file: ./src/mappings/basepool2.ts
+
 
 templates:
   - kind: ethereum
@@ -390,6 +774,8 @@ templates:
           file: ./abis/StableSwap.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -444,6 +830,8 @@ templates:
           file: ./abis/BasePool3.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
@@ -498,6 +886,8 @@ templates:
           file: ./abis/BasePool3.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: UniswapRouter
+          file: ./abis/prices/UniswapRouter.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes

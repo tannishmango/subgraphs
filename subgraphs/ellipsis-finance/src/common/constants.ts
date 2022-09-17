@@ -220,3 +220,15 @@ export const EPS_ADDRESS = Address.fromString("0xA7f552078dcC247C2684336020c0364
 export const EPX_ADDRESS = Address.fromString("0xaf41054c1487b0e5e2b9250c0332ecbce6ce9d71");
 
 export const REGISTRY_ADDRESS_V2 = Address.fromString("0x266Bb386252347b03C7B6eB37F950f476D7c3E63");
+
+export const PANCAKE_ROUTER_ADDRESS = Address.fromString("0x10ED43C718714eb63d5aA57B78B54704E256024E");
+
+export const MISSING_POOLS: string[] = ["0x2ddF6Da17Ae64c22b3Af75158726F2B5F73Ea332"];
+export const MISSING_POOL_COINS: string[][] = [
+  ["0x2e3E3e3CAD5478F63549b7207c860A7f8FEDf4C9", "0xB7d9905eDf8B7B093E3C74af8d6982D0F3d37762"],
+];
+export const MISSING_LP_TOKENS: string[] = ["0x4084203afbc9b20a3ecb9c80dc164a13c9a41eeb"];
+export const MISSING_BASE_POOLs: string[] = [ZERO_ADDRESS];
+export const MISSING_BASEPOOL_COINS: string[][] = [[]];
+
+export const REGISTRY_TO_IGNORE = Address.fromString("0xa43A1F35dD0024584b6d7df47AAcaF8235c2Fea5");
