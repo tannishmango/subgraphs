@@ -170,6 +170,7 @@ export const WBNB_ADDRESS = Address.fromString("0xbb4CdB9CBd36B01bD1cBaEBF2De08d
 export const BUSD_ADDRESS = Address.fromString("0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56");
 export const USDC_ADDRESS = Address.fromString("0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d");
 export const BBTC_ADDRESS = Address.fromString("0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c");
+export const USDT_ADDRESS = Address.fromString("0x55d398326f99059ff775485246999027b3197955");
 export const NATIVE_BNB = Address.fromString("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
 
 export const SIDECHAIN_SUBSTITUTES = new Map<string, Address>();
