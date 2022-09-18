@@ -30,6 +30,7 @@ import {
   EARLY_BASEPOOLS,
   PoolType,
   ZERO_ADDRESS,
+  ADDRESS_ZERO,
 } from "./constants";
 import { createNewPool, getBasePool, getLpToken, getPoolCoinsFromAddress } from "../services/pool";
 
@@ -39,8 +40,8 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   if (!token) {
     if (tokenAddress.toHexString().toLowerCase() == ETH_ADDRESS.toLowerCase()) {
       token = new Token(tokenAddress.toHexString());
-      token.symbol = "ETH";
-      token.name = "Ethereum";
+      token.symbol = "BNB";
+      token.name = "BNB";
       token.decimals = 18;
       token.save();
     } else {
@@ -228,6 +229,16 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
   return protocol;
 }
 
+export function createPoolFeeID(poolID: string, feeType: string): LiquidityPoolFee {
+  let poolFee = LiquidityPoolFee.load(feeType + "-" + poolID);
+  if (!poolFee) {
+    poolFee = new LiquidityPoolFee(feeType + "-" + poolID);
+    poolFee.feeType = feeType;
+    poolFee.save();
+  }
+  return poolFee;
+}
+
 export function getPoolFee(poolID: string, feeType: string): LiquidityPoolFee {
   let poolFee = LiquidityPoolFee.load(feeType + "-" + poolID);
   if (!poolFee) {
@@ -258,14 +269,18 @@ export function getRewardtoken(rewardTokenId: string): RewardToken {
   return rewardToken;
 }
 
-export function getOrCreatePool(poolAddress: Address, event: ethereum.Event): LiquidityPool {
+export function getOrCreatePool(
+  poolAddress: Address,
+  event: ethereum.Event,
+  lpTokenAddress: Address = ADDRESS_ZERO,
+): LiquidityPool {
   let pool = LiquidityPool.load(poolAddress.toHexString());
   if (!pool) {
-    const lpToken = getLpToken(poolAddress);
+    const lpToken = lpTokenAddress == ADDRESS_ZERO ? getLpToken(poolAddress) : lpTokenAddress;
     const lpTokenEntity = getOrCreateToken(lpToken);
     const basePool = getBasePool(poolAddress);
-    const poolCoins = getPoolCoinsFromAddress(poolAddress)
-    const pooltype = EARLY_BASEPOOLS.includes(poolAddress) ? PoolType.BASEPOOL : PoolType.PLAIN
+    const poolCoins = getPoolCoinsFromAddress(poolAddress);
+    const pooltype = EARLY_BASEPOOLS.includes(poolAddress) ? PoolType.BASEPOOL : PoolType.PLAIN;
     pool = createNewPool(
       poolAddress,
       lpToken,
@@ -275,7 +290,7 @@ export function getOrCreatePool(poolAddress: Address, event: ethereum.Event): Li
       event.block.timestamp,
       basePool,
       poolCoins,
-      pooltype
+      pooltype,
     );
   }
   return pool;

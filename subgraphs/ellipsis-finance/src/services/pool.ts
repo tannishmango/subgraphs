@@ -44,7 +44,11 @@ export function createNewPool(
   const stableSwap = StableSwap.bind(poolAddress);
   const tokens = coins.length > 0 ? coins : getPoolCoins(pool);
   const sortedTokens = tokens.sort();
-  log.error("createNewPool tokens {}, sorted tokens {}", [tokens.toString(), sortedTokens.toString()]);
+  log.error("createNewPool pool {} tokens {}, sorted tokens {}", [
+    poolAddress.toHexString(),
+    coins.toString(),
+    sortedTokens.toString(),
+  ]);
   pool.name = name;
   pool.platform = platform.id;
   pool.outputToken = getOrCreateToken(lpToken).id;
@@ -53,13 +57,12 @@ export function createNewPool(
   pool.createdBlockNumber = block;
   pool.createdTimestamp = timestamp;
   pool.basePool = basePool.toHexString();
-  pool.outputTokenPriceUSD = getLpTokenPriceUSD(pool, timestamp);
-  pool.coins = tokens;
+  pool.coins = coins.length > 0 ? coins : getPoolCoins(pool);
   pool.inputTokens = sortedTokens;
+  pool.outputTokenPriceUSD = getLpTokenPriceUSD(pool, timestamp, tokens);
   pool.underlyingTokens = getUnderlyingTokens(pool);
   pool.poolType = poolType;
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
-  pool.save();
   setPoolBalances(pool);
   setPoolTVL(pool, timestamp);
   setPoolFees(pool);
@@ -98,7 +101,7 @@ export function getBasePool(pool: Address): Address {
   if (!basePoolCall.reverted) {
     return basePoolCall.value;
   }
-  return Address.fromString("0x0000000000000000000000000000000000000000");
+  return ADDRESS_ZERO;
 }
 
 export function getWrappedCoins(curvePool: StableSwap): string[] {
@@ -136,10 +139,10 @@ export function getPoolCoins(pool: LiquidityPool): string[] {
 }
 
 export function getBasePoolCoins(pool: LiquidityPool): string[] {
-  const underlyingTokens = pool.underlyingTokens;
   if (pool.basePool == ZERO_ADDRESS) {
     return [];
   }
+  const underlyingTokens = pool.underlyingTokens;
   const basePoolEntity = LiquidityPool.load(pool.basePool);
   if (basePoolEntity) {
     return getPoolCoins(basePoolEntity);

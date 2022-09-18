@@ -159,9 +159,7 @@ export function updateProtocolRevenue(
 ): void {
   let protocol = getOrCreateDexAmm();
   let financialSnapshot = getOrCreateFinancialsDailySnapshot(event);
-  let LpFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_LP_FEE).feePercentage.div(
-    BIGDECIMAL_ONE_HUNDRED,
-  );
+  let LpFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_LP_FEE).feePercentage.div(BIGDECIMAL_ONE_HUNDRED);
   let protocolFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_PROTOCOL_FEE).feePercentage.div(
     BIGDECIMAL_ONE_HUNDRED,
   );
@@ -191,7 +189,7 @@ export function calculateLiquidityFeesUSD(pool: LiquidityPool, fees: BigInt[], e
     let token = getOrCreateToken(Address.fromString(pool.inputTokens[i]));
     feeSum = feeSum.plus(bigIntToBigDecimal(fees[i], token.decimals));
   }
-  let poolAssetPrice = getPoolAssetPrice(pool, event.block.timestamp);
+  let poolAssetPrice = getPoolAssetPrice(pool.inputTokens, event.block.timestamp);
   let totalFeesUSD = feeSum.times(poolAssetPrice);
   return totalFeesUSD;
 }
