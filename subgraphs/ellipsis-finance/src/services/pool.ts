@@ -59,6 +59,7 @@ export function createNewPool(
   pool.underlyingTokens = getUnderlyingTokens(pool);
   pool.poolType = poolType;
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
+  pool.save();
   setPoolBalances(pool);
   setPoolTVL(pool, timestamp);
   setPoolFees(pool);

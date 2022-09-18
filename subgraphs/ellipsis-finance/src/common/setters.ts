@@ -16,11 +16,10 @@ import { getPlatform } from "../services/platform";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import { StableSwap } from "../../generated/Factory/StableSwap";
 
-
 function initBalancesList(pool: LiquidityPool): BigInt[] {
   let inputTokensBalances: BigInt[] = [];
   for (let i = 0; i < pool.inputTokens.length; i++) {
-    inputTokensBalances.push(BIGINT_ZERO)
+    inputTokensBalances.push(BIGINT_ZERO);
   }
   return inputTokensBalances;
 }
@@ -124,7 +123,7 @@ export function setPoolTokenWeights(liquidityPool: LiquidityPool, timestamp: Big
     } else {
       let balance = liquidityPool.inputTokenBalances[j];
       let token = getOrCreateToken(Address.fromString(liquidityPool.inputTokens[j]));
-      const priceUSD = getPoolAssetPrice(liquidityPool, timestamp);
+      const priceUSD = getPoolAssetPrice(liquidityPool.inputTokens, timestamp);
       const balanceUSD = bigIntToBigDecimal(balance, token.decimals).times(priceUSD);
       const weight =
         liquidityPool.totalValueLockedUSD == BIGDECIMAL_ZERO
@@ -139,7 +138,7 @@ export function setPoolTokenWeights(liquidityPool: LiquidityPool, timestamp: Big
 
 export function setPoolTVL(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
-  const priceUSD = getPoolAssetPrice(pool, timestamp);
+  const priceUSD = getPoolAssetPrice(pool.inputTokens, timestamp);
   for (let j = 0; j < pool.inputTokens.length; j++) {
     let balance = pool.inputTokenBalances[j];
     let token = getOrCreateToken(Address.fromString(pool.inputTokens[j]));
