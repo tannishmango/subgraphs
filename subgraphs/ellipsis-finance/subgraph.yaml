@@ -1,7 +1,3 @@
-description: ...
-graft:
-  base: QmTMeUjunpmmnycMU4uUVELGCFt8tYV6DPKAUjsKKP6Fsp # Subgraph ID of base subgraph
-  block: 17000000 # Block number
 specVersion: 0.0.2
 schema:
   file: ./schema.graphql
