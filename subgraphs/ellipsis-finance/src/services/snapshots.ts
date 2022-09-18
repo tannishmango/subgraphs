@@ -1,9 +1,10 @@
 import { LiquidityPool, TokenSnapshot, LptokenPool } from "../../generated/schema";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { StableSwap } from "../../generated/factory/StableSwap";
 import { getUsdRate } from "../common/prices/pricing";
 import { BIGDECIMAL_ZERO, BIG_DECIMAL_1E18, SNAPSHOT_SECONDS } from "../common/constants";
 import { getAtokenPriceUSD, isAtoken } from "../common/prices/aave";
+import { getOrCreateToken } from "../common/getters";
 
 function isCurveLP(tokenAddr: Address): boolean {
   let isLpToken = LptokenPool.load(tokenAddr.toHexString());
@@ -35,19 +36,27 @@ export function getTokenPriceSnapshot(tokenAddr: Address, timestamp: BigInt): Bi
   return priceUSD;
 }
 
-export function getPoolAssetPrice(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
+export function getPoolAssetPrice(poolTokens: string[], timestamp: BigInt): BigDecimal {
+  log.error("getPoolAssetPrice poolTokens {}", [poolTokens.toString()]);
   let priceUSD = BIGDECIMAL_ZERO;
-  for (let i = 0; i < pool.inputTokens.length; ++i) {
-    let tokenSnapshot = TokenSnapshot.load(createTokenSnapshotID(Address.fromString(pool.inputTokens[i]), timestamp));
+  for (let i = 0; i < poolTokens.length; ++i) {
+    let token = getOrCreateToken(Address.fromString(poolTokens[i]));
+    let tokenSnapshot = TokenSnapshot.load(createTokenSnapshotID(Address.fromString(token.id), timestamp));
     if (tokenSnapshot && tokenSnapshot.price != BIGDECIMAL_ZERO) {
-      return tokenSnapshot.price;
-    }
-    tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(Address.fromString(pool.inputTokens[i]), timestamp));
-    priceUSD = getUsdRate(Address.fromString(pool.inputTokens[i]));
-    if (priceUSD != BIGDECIMAL_ZERO) {
-      tokenSnapshot.price = priceUSD;
-      tokenSnapshot.save();
+      priceUSD = tokenSnapshot.price;
+      token.lastPriceUSD = priceUSD;
+      token.save();
       break;
+    } else {
+      tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(Address.fromString(poolTokens[i]), timestamp));
+      priceUSD = getUsdRate(Address.fromString(poolTokens[i]));
+      if (priceUSD != BIGDECIMAL_ZERO) {
+        token.lastPriceUSD = priceUSD;
+        tokenSnapshot.price = priceUSD;
+        token.save();
+        tokenSnapshot.save();
+        break;
+      }
     }
   }
   return priceUSD;
@@ -60,7 +69,7 @@ export function getLpTokenPriceUSD(pool: LiquidityPool, timestamp: BigInt): BigD
   }
   tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(Address.fromString(pool.id), timestamp));
   let curvePool = StableSwap.bind(Address.fromString(pool.id));
-  let assetPriceUSD = getPoolAssetPrice(pool, timestamp);
+  let assetPriceUSD = getPoolAssetPrice(pool.inputTokens, timestamp);
   let virtualPrice = curvePool.try_get_virtual_price();
   if (virtualPrice.reverted) {
     tokenSnapshot.price = assetPriceUSD;
@@ -79,7 +88,7 @@ export function createTokenSnapshotID(tokenAddr: Address, timestamp: BigInt): st
 
 export function getTokenPrice(token: Address, pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   if (!pool.isV2) {
-    const latestPrice = getPoolAssetPrice(pool, timestamp);
+    const latestPrice = getPoolAssetPrice(pool.inputTokens, timestamp);
     return latestPrice;
   }
   return getTokenPriceSnapshot(token, timestamp);
