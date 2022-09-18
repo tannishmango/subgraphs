@@ -1,7 +1,7 @@
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { Factory } from "../../generated/Factory/Factory";
 import { StableSwap } from "../../generated/Factory/StableSwap";
-import { LiquidityPool, LptokenPool } from "../../generated/schema";
+import { LiquidityPool } from "../../generated/schema";
 import {
   ADDRESS_ZERO,
   BIGINT_ONE,
