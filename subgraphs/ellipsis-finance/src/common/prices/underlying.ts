@@ -9,7 +9,7 @@ export function getUnderlyingTokenPrice(tokenAddr: Address, timestamp: BigInt): 
     return tokenSnapshot.price;
   }
   tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(tokenAddr, timestamp));
-  let priceUSD = getUsdRate(tokenAddr);
+  let priceUSD = getUsdRate(tokenAddr, timestamp);
   tokenSnapshot.price = priceUSD;
   tokenSnapshot.save();
   return priceUSD;

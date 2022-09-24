@@ -20,31 +20,34 @@ import {
 import { setPoolFeesV2 } from "../common/setters";
 import { BIGDECIMAL_TWO, PoolType, ZERO_ADDRESS } from "../common/constants";
 
-function handleExchangeUnderlying(i: i32, j: i32, coins: string[], underlyingCoins: string[]): string[] { // i = sold_id, j = bought_id
+function handleExchangeUnderlying(i: i32, j: i32, coins: string[], underlyingCoins: string[]): string[] {
+  // i = sold_id, j = bought_id
   const MAX_COIN = coins.length - 1;
-  let base_i: i32 = 0, base_j: i32 = 0;
-  let input_coin: string = ZERO_ADDRESS, output_coin: string = ZERO_ADDRESS;
-  if (i == 0){
+  let base_i: i32 = 0,
+    base_j: i32 = 0;
+  let input_coin: string = ZERO_ADDRESS,
+    output_coin: string = ZERO_ADDRESS;
+  if (i == 0) {
     input_coin = coins[0];
   } else {
-    base_i = i - MAX_COIN
-    input_coin = underlyingCoins[base_i]
+    base_i = i - MAX_COIN;
+    input_coin = underlyingCoins[base_i];
   }
-  if (j == 0){
-        output_coin = coins[0];
-  } else{
-        base_j = j - MAX_COIN
-        output_coin = underlyingCoins[base_j]
+  if (j == 0) {
+    output_coin = coins[0];
+  } else {
+    base_j = j - MAX_COIN;
+    output_coin = underlyingCoins[base_j];
   }
-  return [input_coin, output_coin]
+  return [input_coin, output_coin];
 }
 
-function handleExchangeUnderlyingLending(i: i32, j: i32, underlyingCoins: string[]): string[] { // i = sold_id, j = bought_id
+function handleExchangeUnderlyingLending(i: i32, j: i32, underlyingCoins: string[]): string[] {
+  // i = sold_id, j = bought_id
   let input_coin = underlyingCoins[i];
   let output_coin = underlyingCoins[j];
-  return [input_coin, output_coin]
+  return [input_coin, output_coin];
 }
-
 
 export function handleExchange(
   buyer: Address,
@@ -71,13 +74,16 @@ export function handleExchange(
 
   if (exchangeUnderlying) {
     if (pool.underlyingTokens.length == 0) {
-      log.error("handleExchangeUnderlying: no underlying coins for pool = {}, txhash = {}",[pool.id, txhash]);
+      log.error("handleExchangeUnderlying: no underlying coins for pool = {}, txhash = {}", [pool.id, txhash]);
     }
-    tokenList = pool.poolType == PoolType.LENDING ? handleExchangeUnderlyingLending(soldId, boughtId, pool.underlyingTokens) : handleExchangeUnderlying(soldId, boughtId, pool.coins, pool.underlyingTokens);
+    tokenList =
+      pool.poolType == PoolType.LENDING
+        ? handleExchangeUnderlyingLending(soldId, boughtId, pool.underlyingTokens)
+        : handleExchangeUnderlying(soldId, boughtId, pool.coins, pool.underlyingTokens);
   } else {
-    tokenList = [pool.coins[soldId],pool.coins[boughtId]]
+    tokenList = [pool.coins[soldId], pool.coins[boughtId]];
   }
-  tokenSold = tokenList[0], tokenBought = tokenList[1];
+  (tokenSold = tokenList[0]), (tokenBought = tokenList[1]);
   tokenSoldDecimals = BigInt.fromI32(getOrCreateToken(Address.fromString(tokenSold.toString())).decimals);
   tokenBoughtDecimals = BigInt.fromI32(getOrCreateToken(Address.fromString(tokenBought.toString())).decimals);
 
@@ -127,14 +133,12 @@ export function handleExchange(
   let dailyVolumeByTokenUSD = dailySnapshot.dailyVolumeByTokenUSD;
   const protocol = getOrCreateDexAmm();
 
-  let inputTokenBalances = pool.inputTokenBalances;
   if (pool.inputTokens.includes(tokenSold.toString())) {
     const tokenSoldIndex = pool.inputTokens.indexOf(tokenSold.toString());
     hourlyVolumeByTokenAmount[tokenSoldIndex] = hourlyVolumeByTokenAmount[tokenSoldIndex].plus(tokens_sold);
     dailyVolumeByTokenAmount[tokenSoldIndex] = dailyVolumeByTokenAmount[tokenSoldIndex].plus(tokens_sold);
     hourlyVolumeByTokenUSD[tokenSoldIndex] = hourlyVolumeByTokenUSD[tokenSoldIndex].plus(amountSoldUSD);
     dailyVolumeByTokenUSD[tokenSoldIndex] = dailyVolumeByTokenUSD[tokenSoldIndex].plus(amountSoldUSD);
-    //inputTokenBalances[tokenSoldIndex] = inputTokenBalances[tokenSoldIndex].plus(tokens_sold);
   }
   if (pool.inputTokens.includes(tokenBought.toString())) {
     const tokenBoughtIndex = pool.inputTokens.indexOf(tokenBought.toString());
@@ -142,7 +146,6 @@ export function handleExchange(
     dailyVolumeByTokenAmount[tokenBoughtIndex] = dailyVolumeByTokenAmount[tokenBoughtIndex].plus(tokens_bought);
     hourlyVolumeByTokenUSD[tokenBoughtIndex] = hourlyVolumeByTokenUSD[tokenBoughtIndex].plus(amountBoughtUSD);
     dailyVolumeByTokenUSD[tokenBoughtIndex] = dailyVolumeByTokenUSD[tokenBoughtIndex].plus(amountBoughtUSD);
-    //inputTokenBalances[tokenBoughtIndex] = inputTokenBalances[tokenBoughtIndex].minus(tokens_bought);
   }
 
   hourlySnapshot.hourlyVolumeUSD = hourlySnapshot.hourlyVolumeUSD.plus(volumeUSD);

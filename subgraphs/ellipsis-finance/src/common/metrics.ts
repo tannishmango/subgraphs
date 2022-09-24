@@ -1,9 +1,7 @@
 import { BigDecimal, Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount, LiquidityPool } from "../../generated/schema";
 import { getLpTokenPriceUSD, getPoolAssetPrice } from "../services/snapshots";
-//import { getLpTokenPriceUSD, getPoolAssetPrice } from "../services/snapshots";
 import {
-  BIGDECIMAL_ONE,
   BIGDECIMAL_ONE_HUNDRED,
   BIGDECIMAL_ZERO,
   LiquidityPoolFeeType,
@@ -159,9 +157,7 @@ export function updateProtocolRevenue(
 ): void {
   let protocol = getOrCreateDexAmm();
   let financialSnapshot = getOrCreateFinancialsDailySnapshot(event);
-  let LpFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_LP_FEE).feePercentage.div(
-    BIGDECIMAL_ONE_HUNDRED,
-  );
+  let LpFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_LP_FEE).feePercentage.div(BIGDECIMAL_ONE_HUNDRED);
   let protocolFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_PROTOCOL_FEE).feePercentage.div(
     BIGDECIMAL_ONE_HUNDRED,
   );
