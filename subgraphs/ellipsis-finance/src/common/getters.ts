@@ -19,9 +19,9 @@ import {
   ProtocolType,
   SECONDS_PER_DAY,
   BIGINT_ZERO,
-  ETH_ADDRESS,
+  NATIVE_TOKEN_ADDRESS,
   RewardTokenType,
-  FACTORY,
+  FACTORY_ADDRESS,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   PROTOCOL_SCHEMA_VERSION,
@@ -38,7 +38,7 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
   // fetch info if null
   if (!token) {
-    if (tokenAddress.toHexString().toLowerCase() == ETH_ADDRESS.toLowerCase()) {
+    if (tokenAddress.toHexString().toLowerCase() == NATIVE_TOKEN_ADDRESS.toLowerCase()) {
       token = new Token(tokenAddress.toHexString());
       token.symbol = "BNB";
       token.name = "BNB";
@@ -72,7 +72,7 @@ export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): Usa
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(id.toString());
-    usageMetrics.protocol = FACTORY;
+    usageMetrics.protocol = FACTORY_ADDRESS.toHexString();
 
     usageMetrics.hourlyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
@@ -95,7 +95,7 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-    usageMetrics.protocol = FACTORY;
+    usageMetrics.protocol = FACTORY_ADDRESS.toHexString();
 
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
@@ -115,7 +115,7 @@ export function getOrCreatePoolHourlySnapshot(poolAddress: string, event: ethere
 
   if (!poolMetrics) {
     poolMetrics = new LiquidityPoolHourlySnapshot(poolAddress.concat("-").concat(id.toString()));
-    poolMetrics.protocol = FACTORY;
+    poolMetrics.protocol = FACTORY_ADDRESS.toHexString();
     poolMetrics.pool = poolAddress;
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.hourlyVolumeUSD = BIGDECIMAL_ZERO;
@@ -148,7 +148,7 @@ export function getOrCreatePoolDailySnapshot(poolAddress: string, event: ethereu
   if (!poolMetrics) {
     let pool = getLiquidityPool(poolAddress);
     poolMetrics = new LiquidityPoolDailySnapshot(poolAddress.concat("-").concat(id.toString()));
-    poolMetrics.protocol = FACTORY;
+    poolMetrics.protocol = FACTORY_ADDRESS.toHexString();
     poolMetrics.pool = poolAddress;
     poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
     poolMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
@@ -183,7 +183,7 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
   if (!financialMetrics) {
     let protocol = getOrCreateDexAmm();
     financialMetrics = new FinancialsDailySnapshot(id.toString());
-    financialMetrics.protocol = FACTORY;
+    financialMetrics.protocol = FACTORY_ADDRESS.toHexString();
     financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
     financialMetrics.protocolControlledValueUSD = protocol.protocolControlledValueUSD;
     financialMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
@@ -206,10 +206,10 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
 ///////////////////////////
 
 export function getOrCreateDexAmm(): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(FACTORY);
+  let protocol = DexAmmProtocol.load(FACTORY_ADDRESS.toHexString());
 
   if (!protocol) {
-    protocol = new DexAmmProtocol(FACTORY);
+    protocol = new DexAmmProtocol(FACTORY_ADDRESS.toHexString());
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
     protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;

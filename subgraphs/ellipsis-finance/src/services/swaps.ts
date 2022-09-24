@@ -91,7 +91,7 @@ export function handleExchange(
   const amountBought = tokens_bought.toBigDecimal().div(exponentToBigDecimal(tokenBoughtDecimals.toI32()));
   let amountBoughtUSD: BigDecimal, amountSoldUSD: BigDecimal;
   if (!pool.isV2) {
-    const latestPrice = getPoolAssetPrice(pool.inputTokens, timestamp);
+    const latestPrice = getPoolAssetPrice(pool, timestamp);
     amountBoughtUSD = amountBought.times(latestPrice);
     amountSoldUSD = amountSold.times(latestPrice);
   } else {

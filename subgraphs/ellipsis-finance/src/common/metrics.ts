@@ -1,9 +1,7 @@
 import { BigDecimal, Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount, LiquidityPool } from "../../generated/schema";
 import { getLpTokenPriceUSD, getPoolAssetPrice } from "../services/snapshots";
-//import { getLpTokenPriceUSD, getPoolAssetPrice } from "../services/snapshots";
 import {
-  BIGDECIMAL_ONE,
   BIGDECIMAL_ONE_HUNDRED,
   BIGDECIMAL_ZERO,
   LiquidityPoolFeeType,
@@ -189,7 +187,7 @@ export function calculateLiquidityFeesUSD(pool: LiquidityPool, fees: BigInt[], e
     let token = getOrCreateToken(Address.fromString(pool.inputTokens[i]));
     feeSum = feeSum.plus(bigIntToBigDecimal(fees[i], token.decimals));
   }
-  let poolAssetPrice = getPoolAssetPrice(pool.inputTokens, event.block.timestamp);
+  let poolAssetPrice = getPoolAssetPrice(pool, event.block.timestamp);
   let totalFeesUSD = feeSum.times(poolAssetPrice);
   return totalFeesUSD;
 }

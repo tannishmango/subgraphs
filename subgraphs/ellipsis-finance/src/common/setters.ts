@@ -63,15 +63,21 @@ export function setPoolFeesV2(pool: LiquidityPool): void {
     BigInt.fromI32(pool.inputTokens.length / (4 * (pool.inputTokens.length - 1))).toString(),
   );
 
-  let depositFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.DEPOSIT_FEE);
-  depositFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
-  depositFee.save();
+  // let depositFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.DEPOSIT_FEE);
+  // depositFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
+  // depositFee.save();
 
-  let withdrawFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.WITHDRAWAL_FEE);
-  withdrawFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
-  withdrawFee.save();
+  // let withdrawFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.WITHDRAWAL_FEE);
+  // withdrawFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
+  // withdrawFee.save();
 
-  let poolFees = [tradingFee.id, protocolFee.id, lpFee.id, depositFee.id, withdrawFee.id];
+  let poolFees = [
+    tradingFee.id,
+    protocolFee.id,
+    lpFee.id,
+    //depositFee.id,
+    // withdrawFee.id
+  ];
   pool.fees = poolFees;
   pool.save();
   return;
@@ -104,15 +110,21 @@ export function setPoolFees(pool: LiquidityPool): void {
     BigInt.fromI32(pool.inputTokens.length / (4 * (pool.inputTokens.length - 1))).toString(),
   );
 
-  let depositFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.DEPOSIT_FEE);
-  depositFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
-  depositFee.save();
+  // let depositFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.DEPOSIT_FEE);
+  // depositFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
+  // depositFee.save();
 
-  let withdrawFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.WITHDRAWAL_FEE);
-  withdrawFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
-  withdrawFee.save();
+  // let withdrawFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.WITHDRAWAL_FEE);
+  // withdrawFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
+  // withdrawFee.save();
 
-  let poolFees = [tradingFee.id, protocolFee.id, lpFee.id, depositFee.id, withdrawFee.id];
+  let poolFees = [
+    tradingFee.id,
+    protocolFee.id,
+    lpFee.id,
+    //depositFee.id,
+    // withdrawFee.id
+  ];
   pool.fees = poolFees;
   pool.save();
   return;
@@ -137,7 +149,7 @@ export function setPoolTokenWeights(liquidityPool: LiquidityPool, timestamp: Big
     } else {
       let balance = liquidityPool.inputTokenBalances[j];
       let token = getOrCreateToken(Address.fromString(liquidityPool.inputTokens[j]));
-      const priceUSD = getPoolAssetPrice(liquidityPool.inputTokens, timestamp);
+      const priceUSD = getPoolAssetPrice(liquidityPool, timestamp);
       const balanceUSD = bigIntToBigDecimal(balance, token.decimals).times(priceUSD);
       const weight =
         liquidityPool.totalValueLockedUSD == BIGDECIMAL_ZERO
@@ -146,13 +158,22 @@ export function setPoolTokenWeights(liquidityPool: LiquidityPool, timestamp: Big
       inputTokenWeights.push(weight);
     }
   }
+
+  // if the weights of the pool are completely off, the pool is probably dead
+  for (let i = 0; i < inputTokenWeights.length; i++) {
+    let tokenWeight = inputTokenWeights[i];
+    if (tokenWeight < BigDecimal.fromString("0.1")) {
+      liquidityPool.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    }
+  }
+
   liquidityPool.inputTokenWeights = inputTokenWeights;
   liquidityPool.save();
 }
 
 export function setPoolTVL(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
-  const priceUSD = getPoolAssetPrice(pool.inputTokens, timestamp);
+  const priceUSD = getPoolAssetPrice(pool, timestamp);
   log.error("setPoolTVL: tokens = {}", [pool.inputTokens.toString()]);
   for (let j = 0; j < pool.inputTokens.length; j++) {
     let balance = pool.inputTokenBalances[j];

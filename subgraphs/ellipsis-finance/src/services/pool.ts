@@ -8,7 +8,7 @@ import {
   BIGINT_ZERO,
   PoolType,
   POOL_LP_TOKEN_MAP,
-  REGISTRY_ADDRESS,
+  FACTORY_ADDRESS,
   ZERO_ADDRESS,
 } from "../common/constants";
 import { getOrCreateToken } from "../common/getters";
@@ -59,7 +59,8 @@ export function createNewPool(
   pool.basePool = basePool.toHexString();
   pool.coins = coins.length > 0 ? coins : getPoolCoins(pool);
   pool.inputTokens = sortedTokens;
-  pool.outputTokenPriceUSD = getLpTokenPriceUSD(pool, timestamp, tokens);
+  pool.save();
+  pool.outputTokenPriceUSD = getLpTokenPriceUSD(pool, timestamp);
   pool.underlyingTokens = getUnderlyingTokens(pool);
   pool.poolType = poolType;
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
@@ -96,7 +97,7 @@ export function getBasePool(pool: Address): Address {
   if (!basePoolCall.reverted) {
     return basePoolCall.value;
   }
-  const registry = Factory.bind(REGISTRY_ADDRESS);
+  const registry = Factory.bind(FACTORY_ADDRESS);
   basePoolCall = registry.try_get_base_pool(pool);
   if (!basePoolCall.reverted) {
     return basePoolCall.value;

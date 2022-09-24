@@ -1,6 +1,6 @@
 description: ...
 graft:
-  base: QmPCeymEsXbkEwGcNTjDuA5DLSCVJHtfvCau5W26W4KYem # Subgraph ID of base subgraph
+  base: QmPiKA1ysfcrixq5BuUW9w8YJP4ovm5A9NcURwTsxTQnMm # Subgraph ID of base subgraph
   block: 15072000 # Block number
 specVersion: 0.0.2
 schema:
