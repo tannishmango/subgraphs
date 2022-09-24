@@ -63,21 +63,15 @@ export function setPoolFeesV2(pool: LiquidityPool): void {
     BigInt.fromI32(pool.inputTokens.length / (4 * (pool.inputTokens.length - 1))).toString(),
   );
 
-  // let depositFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.DEPOSIT_FEE);
-  // depositFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
-  // depositFee.save();
+  let depositFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.DEPOSIT_FEE);
+  depositFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
+  depositFee.save();
 
-  // let withdrawFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.WITHDRAWAL_FEE);
-  // withdrawFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
-  // withdrawFee.save();
+  let withdrawFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.WITHDRAWAL_FEE);
+  withdrawFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
+  withdrawFee.save();
 
-  let poolFees = [
-    tradingFee.id,
-    protocolFee.id,
-    lpFee.id,
-    //depositFee.id,
-    // withdrawFee.id
-  ];
+  let poolFees = [tradingFee.id, protocolFee.id, lpFee.id, depositFee.id, withdrawFee.id];
   pool.fees = poolFees;
   pool.save();
   return;
@@ -110,21 +104,15 @@ export function setPoolFees(pool: LiquidityPool): void {
     BigInt.fromI32(pool.inputTokens.length / (4 * (pool.inputTokens.length - 1))).toString(),
   );
 
-  // let depositFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.DEPOSIT_FEE);
-  // depositFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
-  // depositFee.save();
+  let depositFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.DEPOSIT_FEE);
+  depositFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
+  depositFee.save();
 
-  // let withdrawFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.WITHDRAWAL_FEE);
-  // withdrawFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
-  // withdrawFee.save();
+  let withdrawFee = createPoolFeeID(pool.id, LiquidityPoolFeeType.WITHDRAWAL_FEE);
+  withdrawFee.feePercentage = liqFeeRatio.times(totalFee.minus(adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
+  withdrawFee.save();
 
-  let poolFees = [
-    tradingFee.id,
-    protocolFee.id,
-    lpFee.id,
-    //depositFee.id,
-    // withdrawFee.id
-  ];
+  let poolFees = [tradingFee.id, protocolFee.id, lpFee.id, depositFee.id, withdrawFee.id];
   pool.fees = poolFees;
   pool.save();
   return;
